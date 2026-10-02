@@ -1,0 +1,30 @@
+name: Full CI CD Pipeline
+
+on:
+  push:
+    branches: [ "main", "master" ]
+
+jobs:
+  testing:
+    name: 🧪 1. Continuous Integration (Unit Test)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with: { node-version: '18' }
+      - run: npm install
+      - run: npm test
+
+  building:
+    name: 📦 2. Continuous Delivery (Build App)
+    needs: testing
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Đang đóng gói ứng dụng..." && sleep 4
+
+  deploying:
+    name: 🚀 3. Continuous Deployment (Deploy Production)
+    needs: building
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Đã tự động cập nhật phiên bản mới!" && sleep 4
