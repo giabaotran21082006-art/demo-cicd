@@ -1,5 +1,11 @@
 {
   "name": "demo-cicd",
-  "scripts": { "test": "jest" },
-  "devDependencies": { "jest": "^29.0.0" }
+  "version": "1.0.0",
+  "description": "Demo CI/CD Pipeline",
+  "scripts": {
+    "test": "jest"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  }
 }
