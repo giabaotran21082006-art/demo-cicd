@@ -1,17 +1,25 @@
-name: Full CI CD Pipeline
+name: Full CI/CD Pipeline
 
 on:
   push:
-    branches: [ "main", "master" ]
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
 
 jobs:
-
-  testing:
-    name: 🧪 1. Continuous Integration - Unit Test
+  # TẦNG 1: CONTINUOUS INTEGRATION (TEST)
+  unit-test:
+    name: 🧪 1. Run Unit Tests
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout source code
+      - name: Checkout Code
         uses: actions/checkout@v4
 
       - name: Setup Node.js
@@ -19,41 +27,46 @@ jobs:
         with:
           node-version: '18'
 
-      - name: Install dependencies
+      - name: Install Dependencies
         run: npm install
 
-      - name: Run Unit Test
+      - name: Run Jest Test
         run: npm test
 
-
-  building:
-      name: 📦 2. Continuous Delivery - Build Application
-      needs: testing
-      runs-on: ubuntu-latest
-  
-      steps:
-        - name: Checkout source code
-          uses: actions/checkout@v4
-  
-        - name: Build application
-          run: |
-            echo "Building application..."
-            mkdir dist
-            cp index.html dist/index.html
-            echo "Build completed successfully!"
-  
-
-  deploying:
-    name: 🚀 3. Continuous Deployment - Deploy Production
-    needs: building
+  # TẦNG 2: BUILD & PACKAGE
+  build-package:
+    name: 📦 2. Build Artifact
+    needs: unit-test
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout source code
+      - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Deploy to Vercel
-        run: npx vercel deploy --cwd . --prod --yes --token="${{ secrets.VERCEL_TOKEN }}"
-        env:
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Build Web Dist
+        run: npm run build
+
+      - name: Upload Page Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: 'dist/'
+
+  # TẦNG 3: CONTINUOUS DEPLOYMENT (DEPLOY)
+  deploy-production:
+    name: 🚀 3. Deploy to Live Server
+    needs: build-package
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
