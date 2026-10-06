@@ -5,26 +5,55 @@ on:
     branches: [ "main", "master" ]
 
 jobs:
+
   testing:
-    name: 🧪 1. Continuous Integration (Unit Test)
+    name: 🧪 1. Continuous Integration - Unit Test
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with: { node-version: '18' }
-      - run: npm install
-      - run: npm test
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run Unit Test
+        run: npm test
+
 
   building:
-    name: 📦 2. Continuous Delivery (Build App)
+    name: 📦 2. Continuous Delivery - Build Application
     needs: testing
     runs-on: ubuntu-latest
+
     steps:
-      - run: echo "Đang đóng gói ứng dụng..." && sleep 4
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Build application
+        run: |
+          echo "Building application..."
+          mkdir dist
+          cp index.html dist/index.html
+          echo "Build completed successfully!"
+
 
   deploying:
-    name: 🚀 3. Continuous Deployment (Deploy Production)
+    name: 🚀 3. Continuous Deployment - Deploy Production
     needs: building
     runs-on: ubuntu-latest
+
     steps:
-      - run: echo "Đã tự động cập nhật phiên bản mới!" && sleep 4
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Deploy to Vercel
+        run: npx vercel --prod --yes --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
