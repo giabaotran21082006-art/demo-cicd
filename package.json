@@ -1,9 +1,11 @@
 {
-  "name": "demo-cicd",
+  "name": "cicd-demo-app",
   "version": "1.0.0",
-  "description": "Demo CI/CD Pipeline",
+  "description": "Demo Full CI/CD Pipeline for University Presentation",
+  "main": "src/calculator.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "build": "node build.js"
   },
   "devDependencies": {
     "jest": "^29.7.0"
