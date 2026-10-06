@@ -27,33 +27,33 @@ jobs:
 
 
   building:
-    name: 📦 2. Continuous Delivery - Build Application
-    needs: testing
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout source code
-        uses: actions/checkout@v4
-
-      - name: Build application
-        run: |
-          echo "Building application..."
-          mkdir dist
-          cp index.html dist/index.html
-          echo "Build completed successfully!"
-
-
-     deploying:
-      name: 🚀 3. Continuous Deployment - Deploy Production
-      needs: building
+      name: 📦 2. Continuous Delivery - Build Application
+      needs: testing
       runs-on: ubuntu-latest
   
       steps:
         - name: Checkout source code
           uses: actions/checkout@v4
   
-        - name: Deploy to Vercel
-          run: npx vercel deploy --cwd . --prod --yes --token="${{ secrets.VERCEL_TOKEN }}"
-          env:
-            VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-            VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        - name: Build application
+          run: |
+            echo "Building application..."
+            mkdir dist
+            cp index.html dist/index.html
+            echo "Build completed successfully!"
+  
+
+  deploying:
+    name: 🚀 3. Continuous Deployment - Deploy Production
+    needs: building
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Deploy to Vercel
+        run: npx vercel deploy --cwd . --prod --yes --token="${{ secrets.VERCEL_TOKEN }}"
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
